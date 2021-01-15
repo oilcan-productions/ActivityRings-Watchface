@@ -2,14 +2,14 @@
   fill: white;
   text-length: 32;
   text-anchor: middle;
-  font-family: System-Ligth
+  font-family: System-Light;
 }
 
 .leftAligned {
   fill: white;
   text-length: 32;
   text-anchor: start;
-  font-family: System-Light
+  font-family: System-Light;
 }
 
 .weekDaySettings {
@@ -30,10 +30,12 @@
 
 .tzTimeFont {
   font-size: 40;
+  font-family: System-Light;
 }
 .tzCityFont {
   font-size: 32;
   fill: red;
+  font-family: System-Light;
 }
 
 .clock-display {
@@ -49,4 +51,5 @@
 
 #steps #dataCount {
   font-size: 32;
+  font-family: System-Light;
   }

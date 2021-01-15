@@ -6,7 +6,6 @@ import { preferences } from "user-settings";
 import { HeartRateSensor } from "heart-rate";
 import * as battery from "./battery.js";
 import * as heartMonitor from "./hrm.js";
-import * as util from "../common/utils";
 import { me as appbit } from "appbit";
 import { minuteHistory, dayHistory, goals, today } from "user-activity";
 import * as util from "../common/utils";
@@ -14,10 +13,8 @@ import * as weather from "./weather.js";
 import * as messaging from "messaging";
 import * as fs from "fs";
 
-// set debug output to on/off
-const dbg = false;
 // set if running in simulator
-const isSimulator = false;
+const isSimulator = utils.isSimulator();
 
 // Cache setup
 const CACHE_FILE = "cache.txt";
@@ -41,9 +38,8 @@ let currentDay    = "";
 let monthArray    = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun",
                       "Jul", "Aug","Sep", "Oct", "Nov", "Dec" ];
 let dayArray      = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-let secondTzCity  = "UTC";
 let secondTzOffset="0";
-let secondTzShortName = "N/A";
+let secondTzShortName = "N/A"
 
 let cumulativeStepHours   = 0;
 let hourlyStepGoal        = 250;
@@ -53,6 +49,54 @@ let minutesToFetch        = 60;
 let dataTypes     = [ "steps", "calories", "activeZoneMinutes" ];
 let dataProgress  = [];
 
+// Setup Click Event handlers globally here
+// weatherInfo
+let weatherInfo = document.getElementById("weatherInfo");
+
+weatherInfo.addEventListener("click", (evt) => {
+  util.dbgWrite("Weather Info tapped.",util.messageType.DBG_MESSAGE);
+});
+
+// secondTz
+let secondTzInfo = document.getElementById("secondTz");
+
+secondTzInfo.addEventListener("click", (evt) => {
+  util.dbgWrite("Second Timezone tapped.",util.messageType.DBG_MESSAGE);
+});
+
+// heartRate
+let heartRateInfo = document.getElementById("heartRate");
+
+heartRateInfo.addEventListener("click", (evt) => {
+  util.dbgWrite("Heartrate tapped.",util.messageType.DBG_MESSAGE);
+});
+
+// activityRings
+let activityRingsInfo = document.getElementById("activityRings");
+
+activityRingsInfo.addEventListener("click", (evt) => {
+  util.dbgWrite("activityRings tapped.",util.messageType.DBG_MESSAGE);
+});
+
+// batteryInfo
+let batteryInfo = document.getElementById("batteryInfo");
+
+batteryInfo.addEventListener("click", (evt) => {
+  util.dbgWrite("batteryInfo tapped.",util.messageType.DBG_MESSAGE);
+});
+
+// mainDate
+let mainDateInfo = document.getElementById("mainDate");
+
+mainDateInfo.addEventListener("click", (evt) => {
+  util.dbgWrite("mainDate tapped.",util.messageType.DBG_MESSAGE);
+});
+// mainClock
+let mainClockInfo = document.getElementById("mainClock");
+
+mainClockInfo.addEventListener("click", (evt) => {
+  util.dbgWrite("mainClock tapped.",util.messageType.DBG_MESSAGE);
+});
 
 // all global variables need to go above this line ...
 // load cahced values
@@ -74,29 +118,29 @@ for(var i=0; i < dataTypes.length; i++) {
 }
 
 function getHourlyStepCount() {
-  dbgWrite("Getting Hourly Step Count.");
+  util.dbgWrite("Getting Hourly Step Count.");
   loadCache();
   let currentDate = new Date();
   let currentHour = currentDate.getHours();
   let minuteSteps = 0;
   let SKIP = false;
-  dbgWrite("Starting hourly step count for hour " + currentHour);
-  dbgWrite("Current Hour Count: " + cumulativeStepHours);
-  dbgWrite("Time to refresh the hourly steps.");
-  dbgWrite("Current hours: " + cumulativeStepHours);
-  dbgWrite("Querying minuteHistory");
+  util.dbgWrite("Starting hourly step count for hour " + currentHour);
+  util.dbgWrite("Current Hour Count: " + cumulativeStepHours);
+  util.dbgWrite("Time to refresh the hourly steps.");
+  util.dbgWrite("Current hours: " + cumulativeStepHours);
+  util.dbgWrite("Querying minuteHistory");
   const minuteRecords = null;
   if(INITIAL_STEP_CALC) {
     // change the minutes to fetch to all hours of the day.
     minutesToFetch = currentHour * 60;
-    dbgWrite("This is our first run so calculate from today's steps.");
+    util.dbgWrite("This is our first run so calculate from today's steps.");
     cumulativeStepHours = today.adjusted.steps / currentHour;
     if(isSimulator) {
       if(cumulativeStepHours >= 1000) {
         cumulativeStepHours = Math.round(cumulativeStepHours / 200);
       }
     }
-    dbgWrite("Initial step hour estimate for today: " + cumulativeStepHours + " in " + currentHour + " hours.");
+    util.dbgWrite("Initial step hour estimate for today: " + cumulativeStepHours + " in " + currentHour + " hours.");
     INITIAL_STEP_CALC = false;
     saveCache();
   }
@@ -105,9 +149,9 @@ function getHourlyStepCount() {
       minuteRecords = minuteHistory.query({ limit: minutesToFetch });
     }
     catch {
-      dbgWrite("Failed to query minuteHistory",2);
+      util.dbgWrite("Failed to query minuteHistory",2);
     }
-    dbgWrite("Got " + minuteRecords.length + " activity records.");
+    util.dbgWrite("Got " + minuteRecords.length + " activity records.");
     minuteRecords.forEach((minute, index) => {
       if(isNaN(minute.steps)) {
         if(minuteSteps < hourlyStepGoal) {
@@ -120,21 +164,21 @@ function getHourlyStepCount() {
           minuteSteps = minuteSteps + minute.steps;
          }
       }
-      dbgWrite("Steps in Hour: " + minuteSteps);
+      util.dbgWrite("Steps in Hour: " + minuteSteps);
     });    
   }
-  dbgWrite("Cummulative hours: " + cumulativeStepHours);
+  util.dbgWrite("Cummulative hours: " + cumulativeStepHours);
 
   saveCache();
   loadCache();
-  dbgWrite("Done with Hourly Step count");
+  util.dbgWrite("Done with Hourly Step count");
 }
 
 // Refresh data, all other logic is in separate files
 function refreshData(type) {
   let currentType = type.dataType;
   if(currentType=="steps") {
-    dbgWrite("Entering Steps Activity Refresh");
+    util.dbgWrite("Entering Steps Activity Refresh");
       let currentDataProg = cumulativeStepHours;
       let currentDataGoal = 12;
   }
@@ -152,9 +196,9 @@ function refreshData(type) {
      let currentDataProg = (userActivity.today.adjusted[currentType] || 0);
      let currentDataGoal = userActivity.goals[currentType];
   }
-  dbgWrite("Data for activity " + currentType);
-  dbgWrite("Progress: " + currentDataProg);
-  dbgWrite("Goal: " + currentDataGoal);
+  util.dbgWrite("Data for activity " + currentType);
+  util.dbgWrite("Progress: " + currentDataProg);
+  util.dbgWrite("Goal: " + currentDataGoal);
   
   let currentDataArc = (currentDataProg / currentDataGoal) * 360;
   if (currentDataArc > 360) {
@@ -190,9 +234,9 @@ clock.ontick = evt => {
   weekDay.text = dayName;
   date.text = day;
 
-  lblSecondTzCity.text = secondTzShortName;
-  var secondTzResult =  calcTime(secondTzCity,secondTzOffset);
-  dbgWrite("Second Tz: " + secondTzResult);
+  // lblSecondTzCity.text = secondTzShortName;
+  var secondTzResult =  calcTime(secondTzShortName,secondTzOffset);
+  util.dbgWrite("Second Tz: " + secondTzResult);
   secondTzTime.text = secondTzResult[0] + ":" + secondTzResult[1];
   if(secondTzResult[2] != "+0"){
     secondTzDiff.text=secondTzResult[2];
@@ -216,15 +260,15 @@ function calcTime(city, offset) {
     let tzDate = nd.getDate();
     result[0] = hours;
     result[1] = mins;
-    dbgWrite("TZ Date: " + tzDate);
-    dbgWrite("current Date: " + d.getDate());
+    util.dbgWrite("TZ Date: " + tzDate);
+    util.dbgWrite("current Date: " + d.getDate());
     result[2] = "";  
     if(tzDate > d.getDate()) {
-      dbgWrite("Setting +1 day");
+      util.dbgWrite("Setting +1 day");
       result[2] = "+1";
     }
     else if(tzDate < d.getDate()) {
-      dbgWrite("Setting -1 day");
+      util.dbgWrite("Setting -1 day");
       result[2] = "-1";
     }  
     return result;
@@ -265,31 +309,31 @@ setInterval(getHourlyStepCount, hourlyStepsRefreshInterval * 1000 * 60);
 heartMonitor.initialize();
 
 messaging.peerSocket.addEventListener("message", (evt) => {
- // dbgWrite("app/index.js received message: " + JSON.stringify(evt.data));
+ // util.dbgWrite("app/index.js received message: " + JSON.stringify(evt.data));
  if (evt && evt.data && evt.data.key === "resetCache") {
-    dbgWrite("Reset Cache command: " + evt.data.value);
+    util.dbgWrite("Reset Cache command: " + evt.data.value);
     if(evt.data.value == true) {
       resetCache();
     }
   }
   else if (evt && evt.data && evt.data.key === "secondTimeZone") {
-    dbgWrite("Second Timzone message: " + JSON.stringify(evt.data.value[0]));
+    util.dbgWrite("Second Timzone message: " + JSON.stringify(evt.data.value[0]));
     secondTzOffset = evt.data.value.values[0].offset;
     secondTzShortName = evt.data.value.values[0].shortName;
-    dbgWrite("Set Second TZ offset to: " + secondTzOffset);
+    util.dbgWrite("Set Second TZ offset to: " + secondTzOffset);
     saveCache();
     refreshAllData();
   }
   else if (evt && evt.data && evt.data.key === "secondTimeeZoneShortName") {
-    dbgWrite("Second Timzone Short Name message: " + JSON.stringify(evt.data));
+    util.dbgWrite("Second Timzone Short Name message: " + JSON.stringify(evt.data));
     secondTzShortName = evt.data.value.name;
     lblSecondTzCity.text = secondTzShortName;
-    dbgWrite("Set Second TZ City to: " + secondTzShortName);
+    util.dbgWrite("Set Second TZ City to: " + secondTzShortName);
     saveCache();
     refreshAllData();
   }
   else {
-    dbgWrite("Unknonw Message received.");
+    util.dbgWrite("Unknonw Message received. (" + evt.data.key +")");
   }
   // 
 });
@@ -299,28 +343,27 @@ messaging.peerSocket.addEventListener("message", (evt) => {
 appbit.onunload = saveCache();
 
 function saveCache() {
-  dbgWrite("Saving Cache.");
+  util.dbgWrite("Saving Cache.");
   let json_data = {
     "cumulativeStepHours" : cumulativeStepHours,
     "INITIAL_STEP_CALC" : INITIAL_STEP_CALC,
-    "secondTzCity" : secondTzCity,
     "secondTzOffset" : secondTzOffset,
     "secondTzShortName" : secondTzShortName
   };
+  util.dbgWrite("Saving Cache: " + JSON.stringify(json_data),4);
   fs.writeFileSync(CACHE_FILE, json_data, CACHE_TYPE);
 }
 
 function loadCache() {
-  dbgWrite("Loading Cache.");
+  util.dbgWrite("Loading Cache.");
   if (fs.existsSync(CACHE_FILE)) {
-    dbgWrite(CACHE_FILE + " exists! Loading Data.");
+    util.dbgWrite(CACHE_FILE + " exists! Loading Data.");
     let json_object  = fs.readFileSync(CACHE_FILE, CACHE_TYPE);
-    dbgWrite("JSON loaded: " + JSON.stringify(json_object));
+    util.dbgWrite("JSON loaded: " + JSON.stringify(json_object));
     // set the variables
     cumulativeStepHours = json_object.cumulativeStepHours;
     INITIAL_STEP_CALC = json_object.INITIAL_STEP_CALC;
     secondTzOffset = json_object.secondTzOffset;
-    secondTzCity = json_object.secondTzCity;
     secondTzShortName = json_object.secondTzShortName;
 
   }
@@ -334,20 +377,3 @@ function resetCache() {
    });
 }
 
-// Debug Console Writer
-function dbgWrite(message,severity,noOutput) {
-  if(!noOutput) {
-    if(isNaN(severity)) {severity = 1;}
-    if(dbg){
-      if(severity == 3) {
-        console.log("WARNING:" + message);
-      }
-      else if(severity == 2) {
-        console.error("ERROR: " + message);
-      }
-      else {
-        console.log("INFO: " + message);
-      }
-    }
-  }
-}

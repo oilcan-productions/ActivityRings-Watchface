@@ -1,4 +1,12 @@
-const dbg = false;
+// set debug output to on/off
+export const dbg = true;
+export const messageType = {
+    DBG_INFO:       4,
+    DBG_ERROR:      3,
+    DBG_WARNING:    2,
+    DBG_MESSAGE:    1,
+    DBG_PLAIN:      0
+}
 
 // Add zero in front of numbers < 10
 export function zeroPad(i) {
@@ -56,19 +64,31 @@ export function colorModifier(color, percent) {
   return "#"+RR+GG+BB;
 }
 
+export function isSimulator() {
+
+}
+
 // Debug Console Writer
 export function dbgWrite(message,severity,noOutput) {
   if(!noOutput) {
     if(isNaN(severity)) {severity = 1;}
     if(dbg){
-      if(severity == 3) {
-        console.log("WARNING:" + message);
-      }
-      else if(severity == 2) {
-        console.error("ERROR: " + message);
-      }
-      else {
-        console.log("INFO: " + message);
+      switch(severity) {
+        case 3:
+          console.warn("WARNING:" + message);
+          break;
+        case  2:
+          console.error("ERROR: " + message);
+          break;
+        case 1:
+          console.log("MESSAGE: " + message);
+          break;
+        case 4: 
+          console.log("INFO: " + message);
+          break;
+        default:
+          console.log(message);
+        break;
       }
     }
   }

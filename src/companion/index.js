@@ -1,6 +1,7 @@
 import * as messaging from "messaging";
 import { settingsStorage } from "settings";
 import { geolocation } from "geolocation";
+import * as util from "../common/utils";
 
 
 var API_KEY = "a075f4037118dd3d66fd2f3ccecd730f";
@@ -18,48 +19,49 @@ geolocation.getCurrentPosition(locationSuccess, locationError, {
 var watchID = geolocation.watchPosition(locationSuccess, locationError, { timeout: 60 * 1000 });
 
 function locationSuccess(position) {
- // console.log(
- //   "Latitude: " + position.coords.latitude,
- //   "Longitude: " + position.coords.longitude
- // );
+ util.dbgWrite(
+    "Latitude: " + position.coords.latitude,
+    "Longitude: " + position.coords.longitude
+ );
+
     lat = position.coords.latitude;
     lon = position.coords.longitude;
     queryOpenWeather();
 }
 
 function locationError(error) {
-  console.log("Error: " + error.code, "Message: " + error.message);
+  util.dbgWrite("Error: " + error.code, "Message: " + error.message,util.messageType.DBG_ERROR);
 }
 
 
 // Message socket opens
 messaging.peerSocket.onopen = () => {
-  console.log("Companion Socket Open");
+  util.dbgWrite("Companion Socket Open",util.messageType.DBG_INFO);
   restoreSettings();
 };
 
 // Message socket closes
 messaging.peerSocket.onclose = () => {
-  console.log("Companion Socket Closed");
+  util.dbgWrite("Companion Socket Closed",util.messageType.DBG_INFO);
 };
 
 // A user changes settings
 settingsStorage.onchange = evt => {
-  console.log("Change Event Received: " + JSON.stringify(evt));
+  util.dbgWrite("Change Event Received: " + JSON.stringify(evt));
   let data = {
     key: evt.key,
     value: JSON.parse(evt.newValue)
   };
-  console.log("Setting " + evt.key + " changed to " + evt.newValue);
+  util.dbgWrite("Setting " + evt.key + " changed to " + evt.newValue,util.messageType.DBG_INFO);
   sendVal(data);
 };
 
 // Restore any previously saved settings and send to the device
 function restoreSettings() {
   for (let index = 0; index < settingsStorage.length; index++) {
-    console.log("Restoring " + settingsStorage.length + " Settings");
+    util.dbgWrite("Restoring " + settingsStorage.length + " Settings",util.messageType.DBG_INFO);
     let key = settingsStorage.key(index);
-    //console.log("Setting: " + settingsStorage.key(index)); // +  " Value: " + JSON.parse(settingsStorage.getItem(key)));
+    util.dbgWrite("Restoring setting: " + settingsStorage.key(index) +  " Value: " + JSON.stringify(JSON.parse(settingsStorage.getItem(key))),util.messageType.DBG_INFO);
     if (key) {
       let data = {
         key: key,
@@ -82,8 +84,8 @@ function queryOpenWeather() {
   .then(function (response) {
       response.json()
       .then(function(data) {
-        // console.log(JSON.stringify(data)));
-        // console.log ("got weather data");
+        util.dbgWrite("Weather Data (RAW): " +JSON.stringify(data),,util.messageType.DBG_INFO);
+        util.dbgWrite ("got weather data");
         // Send on the data blob
         var weather = {
           // temperature: data["main"]["temp"]
@@ -94,7 +96,7 @@ function queryOpenWeather() {
       });
   })
   .catch(function (err) {
-    console.error(`Error fetching weather: ${err}`);
+    util.dbgWrite("Error fetching weather: " + err,util.messageType.DBG_ERROR);
   });
 }
 
@@ -102,12 +104,12 @@ function returnWeatherData(data) {
   if (messaging.peerSocket.readyState === messaging.peerSocket.OPEN) {
     messaging.peerSocket.send(data);
   } else {
-    console.error("Error: Connection is not open");
+    util.dbgWrite("Error: Connection is not open", ,util.messageType.DBG_ERROR);
   }
 }
 
 messaging.peerSocket.addEventListener("message", (evt) => {
-  console.log("Message received: " + evt.data.command);
+  util.dbgWrite("Message received: " + evt.data.command ,util.messageType.DBG_INFO);
   if (evt.data && evt.data.command === "weather") {
     queryOpenWeather();
   }
@@ -118,12 +120,12 @@ messaging.peerSocket.addEventListener("message", (evt) => {
 });
 
 messaging.peerSocket.addEventListener("error", (err) => {
-  console.error(`Connection error: ${err.code} - ${err.message}`);
+  util.dbgWrite(`Connection error: ${err.code} - ${err.message}`,util.messageType.DBG_ERROR);
 });
-
 
 function resetSettings()
 {
+    util.dbgWrite("Resetting Settings: ", ,util.messageType.DBG_INFO)
     // reset the settings
   settingsStorage.clear();
 }
