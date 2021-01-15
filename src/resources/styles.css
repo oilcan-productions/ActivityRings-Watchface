@@ -1,0 +1,52 @@
+.baseSettings {
+  fill: white;
+  text-length: 32;
+  text-anchor: middle;
+  font-family: System-Ligth
+}
+
+.leftAligned {
+  fill: white;
+  text-length: 32;
+  text-anchor: start;
+  font-family: System-Light
+}
+
+.weekDaySettings {
+  fill: red;
+  text-length: 32;
+  text-anchor: middle;
+  font-family: System-Light;
+  font-size: 24;
+}
+
+.smallestFont {
+  font-size: 15;
+}
+
+.smallFont {
+  font-size: 28;
+}
+
+.tzTimeFont {
+  font-size: 40;
+}
+.tzCityFont {
+  font-size: 32;
+  fill: red;
+}
+
+.clock-display {
+  font-family: System-Bold;
+  fill: white;
+  font-size: 50;
+  text-anchor: middle;
+}
+
+#dataIcon {
+  fill: white;
+}
+
+#steps #dataCount {
+  font-size: 32;
+  }
