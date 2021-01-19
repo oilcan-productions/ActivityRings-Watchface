@@ -14,7 +14,7 @@ import * as messaging from "messaging";
 import * as fs from "fs";
 
 // set if running in simulator
-const isSimulator = utils.isSimulator();
+const isSimulator = util.isSimulator();
 
 // Cache setup
 const CACHE_FILE = "cache.txt";

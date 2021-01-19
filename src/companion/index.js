@@ -23,7 +23,6 @@ function locationSuccess(position) {
     "Latitude: " + position.coords.latitude,
     "Longitude: " + position.coords.longitude
  );
-
     lat = position.coords.latitude;
     lon = position.coords.longitude;
     queryOpenWeather();
@@ -32,7 +31,6 @@ function locationSuccess(position) {
 function locationError(error) {
   util.dbgWrite("Error: " + error.code, "Message: " + error.message,util.messageType.DBG_ERROR);
 }
-
 
 // Message socket opens
 messaging.peerSocket.onopen = () => {
@@ -84,7 +82,7 @@ function queryOpenWeather() {
   .then(function (response) {
       response.json()
       .then(function(data) {
-        util.dbgWrite("Weather Data (RAW): " +JSON.stringify(data),,util.messageType.DBG_INFO);
+        util.dbgWrite("Weather Data (RAW): " + JSON.stringify(data), util.messageType.DBG_INFO);
         util.dbgWrite ("got weather data");
         // Send on the data blob
         var weather = {
@@ -96,7 +94,7 @@ function queryOpenWeather() {
       });
   })
   .catch(function (err) {
-    util.dbgWrite("Error fetching weather: " + err,util.messageType.DBG_ERROR);
+    util.dbgWrite("Error fetching weather: " + err, util.messageType.DBG_ERROR);
   });
 }
 
@@ -104,7 +102,7 @@ function returnWeatherData(data) {
   if (messaging.peerSocket.readyState === messaging.peerSocket.OPEN) {
     messaging.peerSocket.send(data);
   } else {
-    util.dbgWrite("Error: Connection is not open", ,util.messageType.DBG_ERROR);
+    util.dbgWrite("Error: Connection is not open", util.messageType.DBG_ERROR);
   }
 }
 
@@ -125,7 +123,7 @@ messaging.peerSocket.addEventListener("error", (err) => {
 
 function resetSettings()
 {
-    util.dbgWrite("Resetting Settings: ", ,util.messageType.DBG_INFO)
+    util.dbgWrite("Resetting Settings: ", util.messageType.DBG_INFO)
     // reset the settings
   settingsStorage.clear();
 }

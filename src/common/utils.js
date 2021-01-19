@@ -65,7 +65,7 @@ export function colorModifier(color, percent) {
 }
 
 export function isSimulator() {
-
+    return true;
 }
 
 // Debug Console Writer
