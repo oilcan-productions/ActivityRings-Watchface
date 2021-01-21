@@ -182,7 +182,7 @@ function getHourlyStepCount() {
 // Refresh data, all other logic is in separate files
 function refreshData(type) {
   let currentType = type.dataType;
-  util.dbgWrite("Entering " + currentType + " refresh.",util.DBG_INFO);
+  util.dbgWrite("Entering " + currentType + " refresh.",util.messageType.DBG_INFO);
   if(currentType=="steps") {
       let currentDataProg = cumulativeStepHours;
       let currentDataGoal = 12;
