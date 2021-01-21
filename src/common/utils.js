@@ -5,7 +5,7 @@ import { outbox } from "file-transfer";
 export const LOG_FILE = "log.txt";
 export const LOG_TYPE = "ascii";
 
-// set debug output to on/of
+// set debug output to on/off
 export const dbg = false;
 export const messageType = {
     DBG_INFO:       4,
@@ -107,6 +107,7 @@ export function dbgWrite(message,severity,noOutput) {
       console.log(message);
     }
   }
+  // write to the log file.
   writeLog(message);
 }
 
