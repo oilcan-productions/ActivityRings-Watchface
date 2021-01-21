@@ -138,6 +138,11 @@ function mySettings(props) {
           onClick={() => props.settingsStorage.setItem("getlog", "true")}
         />
       </Section>
+      <TextInput
+        label = "logfile URL"
+        text = "upload log to get Url"
+        settingsKey = "logURL"
+      />
     </Page>
   );
 }

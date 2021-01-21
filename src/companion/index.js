@@ -1,6 +1,7 @@
 import * as messaging from "messaging";
 import { settingsStorage } from "settings";
 import { geolocation } from "geolocation";
+import * as uploadHelper from "./logUpload.js";
 
 import { inbox } from "file-transfer";
 
@@ -61,6 +62,9 @@ settingsStorage.onchange = evt => {
   };
   dbgWrite("Setting " + evt.key + " changed to " + evt.newValue,messageType.DBG_INFO);
   sendVal(data);
+  if(evt.key == "logURL") {
+    
+  }
 };
 
 // Restore any previously saved settings and send to the device
@@ -146,6 +150,8 @@ async function processAllFiles() {
   while ((file = await inbox.pop())) {
     const payload = await file.text();
     console.log(`file contents: ${payload}`);
+    let fileUrl = uploadHelper.uploadFile(payload);
+    settingsStorage.setItem("logURL",fileUrl);
   }
 }
 
