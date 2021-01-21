@@ -49,6 +49,9 @@ let minutesToFetch        = 60;
 let dataTypes     = [ "steps", "calories", "activeZoneMinutes" ];
 let dataProgress  = [];
 
+// check log File
+util.checkLogFileSize();
+
 // Setup Click Event handlers globally here
 // weatherInfo
 let weatherInfo = document.getElementById("weatherInfo");
