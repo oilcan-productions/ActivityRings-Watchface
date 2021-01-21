@@ -101,12 +101,7 @@ export function dbgWrite(message,severity,noOutput) {
         break;
       default:
         if(dbg){console.log (message);}
-      break;
-    }
-    
-    if(severity == 4) {
-      message = "INFO: " + message;
-      console.log(message);
+        break;
     }
   }
   // write to the log file.
@@ -127,18 +122,18 @@ export function checkLogFileSize(maxFileSize) {
       console.log("Last modified: " + stats.mtime);
       if(stats.size >= 200000) {
           deleteLogFile();
-          dbgWrite("Truncated logfile.",DBG_WARNING);
+          dbgWrite("Truncated logfile.",messageType.DBG_WARNING);
       }
     }
   }
 }
 
 // list files in the device directory 
-function listFiles() {
+export function listFiles(folderName) {
   let dirIter = null;
-  const listDir = listDirSync("/private/data/");
+  const listDir = listDirSync(folderName);
   while((dirIter = listDir.next()) && !dirIter.done) {
-    console.log(dirIter.value);
+    dbgWrite("File: " + dirIter.value, DBG_INFO);
   }
 }
 
