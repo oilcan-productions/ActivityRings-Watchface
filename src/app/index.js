@@ -16,6 +16,11 @@ import * as fs from "fs";
 // set if running in simulator
 const bIsSimulator = isSimulator();
 
+// version
+const app_version = "1.1.6";
+let appVersionLabel = document.getElementById("app-version");
+appVersionLabel.text = app_version;
+
 // Cache setup
 const CACHE_FILE = "cache.txt";
 const CACHE_TYPE = "json";

@@ -5,6 +5,10 @@
       <rect id="batteryLevel" x="4" y="4" height="10" />
     </image>
   </svg>
+  
+  <svg id="faceVersionBlock" class="appData">
+    <text id="app-version" class="baseSettings smallestFont" x="50%+25" y="10" text="1.1.6" />
+  </svg>
     <!-- Date -->
   <svg id="mainDate" pointer-events="visible" >
     <text id="weekDay" class="weekDaySettings" x="52" y="60"/> 
@@ -57,4 +61,5 @@
       <arc id="arcFront" x="20%-22" y="80%-22" width="44" height="44" fill="#00BFDF" arc-width="7" start-angle="0" sweep-angle="100" />
     </g>
   </svg>
+
 </svg>
