@@ -5,7 +5,7 @@ export function uploadFile(data) {
   console.log ("Upload this: " + data)
   let jsondata = data; //`text=${escape(JSON.stringify(data))}`;
   // console.log(jsondata);
-  uploadProcess(jsondata);
+  // uploadProcess(jsondata);
 }
 
 function uploadProcess(jsondata){

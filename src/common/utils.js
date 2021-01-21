@@ -8,7 +8,7 @@ export const LOG_FILE = "log.txt";
 export const LOG_TYPE = "ascii";
 
 // set debug output to on/off
-export const dbg = true;
+export const dbg = false;
 export const messageType = {
     DBG_INFO:       4,
     DBG_ERROR:      3,
