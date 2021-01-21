@@ -26,7 +26,7 @@
   </svg>
   
   <!-- Second Timezonz -->
-  <svg id="secondTz" pointer-events="visible" >livingwell
+  <svg id="secondTz" pointer-events="visible" >livingwellbay
     <text id="secondTzCity" x="50%+10" y="75%+10" class="baseSettings tzCityFont">UTC</text>
     <text id="secondTzData" x="50%+10" y="80%+30" class="baseSettings tzTimeFont">--:--</text>
     <text id="secondTzDiff" x="50%+65" y="80%+30" class="baseSettings" font-size="20">+1</text>

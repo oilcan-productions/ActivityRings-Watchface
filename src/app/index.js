@@ -14,7 +14,7 @@ import * as messaging from "messaging";
 import * as fs from "fs";
 
 // set if running in simulator
-const isSimulator = util.isSimulator();
+const bIsSimulator = isSimulator();
 
 // Cache setup
 const CACHE_FILE = "cache.txt";
@@ -23,7 +23,7 @@ const CACHE_DIRTY = false;
 
 // interval settings
 const weatherRefreshInterval        = 30;
-const hourlyStepsRefreshInterval    = 5;
+const hourlyStepsRefreshInterval    = 30;
 
 // Set up all necessary variables
 let clockLabel = document.getElementById("clockLabel");
@@ -130,6 +130,11 @@ function getHourlyStepCount() {
   util.dbgWrite("Current hours: " + cumulativeStepHours);
   util.dbgWrite("Querying minuteHistory");
   const minuteRecords = null;
+  if(currentHour == 0) {
+    // we are in the midnight hour. Reset the hourly count and save the cache
+    cumulativeStepHours = 0;
+    saveCache();
+  }
   if(INITIAL_STEP_CALC) {
     // change the minutes to fetch to all hours of the day.
     minutesToFetch = currentHour * 60;
@@ -316,7 +321,7 @@ messaging.peerSocket.addEventListener("message", (evt) => {
       resetCache();
     }
   }
-  else if (evt && evt.data && evt.data.key === "secondTimeZone") {
+  if (evt && evt.data && evt.data.key === "secondTimeZone") {
     util.dbgWrite("Second Timzone message: " + JSON.stringify(evt.data.value[0]));
     secondTzOffset = evt.data.value.values[0].offset;
     secondTzShortName = evt.data.value.values[0].shortName;
@@ -324,13 +329,17 @@ messaging.peerSocket.addEventListener("message", (evt) => {
     saveCache();
     refreshAllData();
   }
-  else if (evt && evt.data && evt.data.key === "secondTimeeZoneShortName") {
+  if (evt && evt.data && evt.data.key === "secondTimeeZoneShortName") {
     util.dbgWrite("Second Timzone Short Name message: " + JSON.stringify(evt.data));
     secondTzShortName = evt.data.value.name;
     lblSecondTzCity.text = secondTzShortName;
     util.dbgWrite("Set Second TZ City to: " + secondTzShortName);
     saveCache();
     refreshAllData();
+  }
+  if (evt && evt.data && evt.data.key === "getlog") {
+    util.dbgWrite("Get LogFile message: " + JSON.stringify(evt.data));
+    util.sendLog();
   }
   else {
     util.dbgWrite("Unknonw Message received. (" + evt.data.key +")");
@@ -376,4 +385,11 @@ function resetCache() {
       command: "resetCacheFalse"
    });
 }
+ function isSimulator() {
+  var result = false;
+  
+  util.dbgWrite("Utils: isSimulator: " + result);
+  return result;
+}
+
 

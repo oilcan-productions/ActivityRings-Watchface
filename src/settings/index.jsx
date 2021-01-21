@@ -132,6 +132,11 @@ function mySettings(props) {
           label="Reset Cache"
           onClick={() => props.settingsStorage.setItem("resetCache", "true")}
         />
+         <Button
+          list
+          label="Get Logfile"
+          onClick={() => props.settingsStorage.setItem("getlog", "true")}
+        />
       </Section>
     </Page>
   );

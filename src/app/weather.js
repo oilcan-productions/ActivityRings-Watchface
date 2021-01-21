@@ -66,7 +66,7 @@ function processWeatherData(data) {
         conditionIcon = "../resources/icons/whiteMoon.png";
       break; 
   }
-  util.dbgWrite(conditionIcon);
+  util.dbgWrite("Selected Weather Icom: " + conditionIcon);
   weatherIcon.href = conditionIcon;
   currentTemp.text = Math.round(data.weatherData["main"]["temp"]) + "º";
   weatherCity.text = data.weatherData["name"];

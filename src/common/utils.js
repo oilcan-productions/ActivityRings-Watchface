@@ -1,5 +1,12 @@
-// set debug output to on/off
-export const dbg = true;
+import * as fs from "fs";
+import { listDirSync } from "fs";
+import { outbox } from "file-transfer";
+
+export const LOG_FILE = "log.txt";
+export const LOG_TYPE = "ascii";
+
+// set debug output to on/of
+export const dbg = false;
 export const messageType = {
     DBG_INFO:       4,
     DBG_ERROR:      3,
@@ -7,6 +14,8 @@ export const messageType = {
     DBG_MESSAGE:    1,
     DBG_PLAIN:      0
 }
+
+deleteLogFile();
 
 // Add zero in front of numbers < 10
 export function zeroPad(i) {
@@ -64,15 +73,11 @@ export function colorModifier(color, percent) {
   return "#"+RR+GG+BB;
 }
 
-export function isSimulator() {
-    return true;
-}
-
 // Debug Console Writer
 export function dbgWrite(message,severity,noOutput) {
   if(!noOutput) {
     if(isNaN(severity)) {severity = 1;}
-    if(dbg){
+    if(dbg) {
       switch(severity) {
         case 3:
           console.warn("WARNING:" + message);
@@ -91,5 +96,51 @@ export function dbgWrite(message,severity,noOutput) {
         break;
       }
     }
+    else {
+      if(severity == 4) {
+        console.log("INFO: " + message);
+      }
+    }
   }
+  writeLog(message);
+}
+
+function deleteLogFile() {
+  fs.unlinkSync(LOG_FILE);
+}
+function listFiles() {
+  let dirIter = null;
+  const listDir = listDirSync("/private/data/");
+  while((dirIter = listDir.next()) && !dirIter.done) {
+    console.log(dirIter.value);
+  }
+}
+export function writeLog(message) {
+  // console.log ("Entering wirteLog");
+  // listFiles();
+  let buffer = str2ab((new Date()).toString() + ": " + message + "\n");
+  let fd = fs.openSync(LOG_FILE, 'a+');
+  fs.writeSync(fd, buffer);
+  fs.closeSync(fd);
+  // console.log("Exiting writeLog");
+}
+
+export function sendLog() {
+  outbox
+   .enqueueFile(LOG_FILE)
+   .then((ft) => {
+     console.log(`Transfer of $‌{ft.name} successfully queued.`);
+   })
+   .catch((error) => {
+     console.log(`Failed to schedule transfer: $‌{error}`);
+   })
+}
+
+function str2ab(str) {
+  var buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
+  var bufView = new Uint16Array(buf);
+  for (var i=0, strLen=str.length; i<strLen; i++) {
+    bufView[i] = str.charCodeAt(i);
+  }
+  return buf;
 }
