@@ -99,7 +99,7 @@ mainClockInfo.addEventListener("click", (evt) => {
 });
 
 // all global variables need to go above this line ...
-// load cahced values
+// load cached values
 loadCache();
 
 let getCurrentDataProgress = function(dataType) {
@@ -182,12 +182,12 @@ function getHourlyStepCount() {
 // Refresh data, all other logic is in separate files
 function refreshData(type) {
   let currentType = type.dataType;
+  util.dbgWrite("Entering " + currentType + " refresh.",util.DBG_INFO);
   if(currentType=="steps") {
-    util.dbgWrite("Entering Steps Activity Refresh");
       let currentDataProg = cumulativeStepHours;
       let currentDataGoal = 12;
   }
-  else if(currentType=="activeZoneMinutes"){
+  else if(currentType=="activeZoneMinutes") {
    let currentDataProg = (today.adjusted.activeZoneMinutes.total || 0);
    let currentDataGoal = goals.activeZoneMinutes.total || 0;
    if(currentDataProg == null) {

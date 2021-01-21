@@ -15,7 +15,8 @@ export const messageType = {
     DBG_PLAIN:      0
 }
 
-deleteLogFile();
+//check if the log is too big and truncate it if needed.
+checkLogFileSize();
 
 // Add zero in front of numbers < 10
 export function zeroPad(i) {
@@ -76,30 +77,34 @@ export function colorModifier(color, percent) {
 // Debug Console Writer
 export function dbgWrite(message,severity,noOutput) {
   if(!noOutput) {
-    if(isNaN(severity)) {severity = 1;}
-    if(dbg) {
-      switch(severity) {
-        case 3:
-          console.warn("WARNING:" + message);
-          break;
-        case  2:
-          console.error("ERROR: " + message);
-          break;
-        case 1:
-          console.log("MESSAGE: " + message);
-          break;
-        case 4: 
-          console.log("INFO: " + message);
-          break;
-        default:
-          console.log(message);
-        break;
-      }
+    if(isNaN(severity)) {
+      severity = 1;
     }
-    else {
-      if(severity == 4) {
-        console.log("INFO: " + message);
-      }
+    switch(severity) {
+      case 3:
+        message = "WARNING:" + message;
+        if(dbg){console.warn (message);}
+        break;
+      case  2:
+        message = "ERROR: " + message;
+        if(dbg){console.error (message);}
+        break;
+      case 1:
+        message = "MESSAGE: " + message;
+        if(dbg){console.log (message);}
+        break;
+      case 4: 
+        message = "INFO: " + message;
+        if(dbg){console.log (message);}
+        break;
+      default:
+        if(dbg){console.log (message);}
+      break;
+    }
+    
+    if(severity == 4) {
+      message = "INFO: " + message;
+      console.log(message);
     }
   }
   writeLog(message);
@@ -108,6 +113,19 @@ export function dbgWrite(message,severity,noOutput) {
 function deleteLogFile() {
   fs.unlinkSync(LOG_FILE);
 }
+
+function checkLogFileSize(maxFileSize) {
+  let stats = fs.statSync(LOG_FILE);
+  if (stats) {
+    console.log("File size: " + stats.size + " bytes");
+    console.log("Last modified: " + stats.mtime);
+    if(stats.size >= 200000) {
+        deleteLogFile();
+        dbgWrite("Truncated logfile.",DBG_WARNING);
+    }
+}
+}
+
 function listFiles() {
   let dirIter = null;
   const listDir = listDirSync("/private/data/");
