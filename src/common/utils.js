@@ -1,7 +1,9 @@
+////#region globals and imports
 import * as fs from "fs";
 import { listDirSync } from "fs";
 import { outbox } from "file-transfer";
 
+// log file constants
 export const LOG_FILE = "log.txt";
 export const LOG_TYPE = "ascii";
 
@@ -14,10 +16,9 @@ export const messageType = {
     DBG_MESSAGE:    1,
     DBG_PLAIN:      0
 }
+////#endregion
 
-//check if the log is too big and truncate it if needed.
-checkLogFileSize();
-
+////#region functions
 // Add zero in front of numbers < 10
 export function zeroPad(i) {
   if (i < 10) {
@@ -54,6 +55,7 @@ export function convertColor(color) {
   return "#"+actualRed+actualGreen+actualBlue;
 }
 
+// color modifier function
 export function colorModifier(color, percent) {
   var R = parseInt(color.substring(1,3),16);
   var G = parseInt(color.substring(3,5),16);
@@ -111,22 +113,27 @@ export function dbgWrite(message,severity,noOutput) {
   writeLog(message);
 }
 
-function deleteLogFile() {
+// delete the log file
+export function deleteLogFile() {
   fs.unlinkSync(LOG_FILE);
 }
 
-function checkLogFileSize(maxFileSize) {
-  let stats = fs.statSync(LOG_FILE);
-  if (stats) {
-    console.log("File size: " + stats.size + " bytes");
-    console.log("Last modified: " + stats.mtime);
-    if(stats.size >= 200000) {
-        deleteLogFile();
-        dbgWrite("Truncated logfile.",DBG_WARNING);
+// truncate log file if larger than 200k bytes
+export function checkLogFileSize(maxFileSize) {
+  if (fs.existsSync(LOG_FILE)) {
+    let stats = fs.statSync(LOG_FILE);
+    if (stats) {
+      console.log("File size: " + stats.size + " bytes");
+      console.log("Last modified: " + stats.mtime);
+      if(stats.size >= 200000) {
+          deleteLogFile();
+          dbgWrite("Truncated logfile.",DBG_WARNING);
+      }
     }
-}
+  }
 }
 
+// list files in the device directory 
 function listFiles() {
   let dirIter = null;
   const listDir = listDirSync("/private/data/");
@@ -134,16 +141,16 @@ function listFiles() {
     console.log(dirIter.value);
   }
 }
+
+// write to log file
 export function writeLog(message) {
-  // console.log ("Entering wirteLog");
-  // listFiles();
   let buffer = str2ab((new Date()).toString() + ": " + message + "\n");
   let fd = fs.openSync(LOG_FILE, 'a+');
   fs.writeSync(fd, buffer);
   fs.closeSync(fd);
-  // console.log("Exiting writeLog");
 }
 
+// send the log to the companion
 export function sendLog() {
   outbox
    .enqueueFile(LOG_FILE)
@@ -155,6 +162,7 @@ export function sendLog() {
    })
 }
 
+// convert string to buffer for log writing.
 function str2ab(str) {
   var buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
   var bufView = new Uint16Array(buf);
@@ -163,3 +171,4 @@ function str2ab(str) {
   }
   return buf;
 }
+////#endregion
