@@ -72,7 +72,11 @@ function restoreSettings() {
   for (let index = 0; index < settingsStorage.length; index++) {
     dbgWrite("Restoring " + settingsStorage.length + " Settings",messageType.DBG_INFO);
     let key = settingsStorage.key(index);
-    dbgWrite("Restoring setting: " + settingsStorage.key(index) +  " Value: " + JSON.stringify(JSON.parse(settingsStorage.getItem(key))),messageType.DBG_INFO);
+    console.log(settingsStorage.getItem(key));
+    if(isNaN(settingsStorage.getItem(key))) {
+      settingsStorage.setItem(key,"{}");
+    }
+    dbgWrite("Restoring setting: " + settingsStorage.key(index)); // +  " Value: " + JSON.stringify(JSON.parse(settingsStorage.getItem(key))),messageType.DBG_INFO);
     if (key) {
       let data = {
         key: key,
@@ -124,14 +128,18 @@ messaging.peerSocket.addEventListener("message", (evt) => {
   if (evt.data && evt.data.command === "weather") {
     queryOpenWeather();
   }
-  else if (evt.data && evt.data.command === "resetCacheFalse") {
+  if (evt.data && evt.data.command === "resetCacheFalse") {
     settingsStorage.setItem("resetCache", "false");
     // resetSettings();
   }
-  else if (evt.data && evt.data.command === "getLog") {
+  if (evt.data && evt.data.command === "getLog") {
     settingsStorage.setItem("getLog", "true");
     processAllFiles();
     settingsStorage.setItem("getLog", "false");
+  }
+  if (evt.data && evt.data.command === "resetSettings") {
+    resetSettings();
+    settingsStorage.setItem("resetSettings", "false");
   }
 });
 

@@ -52,6 +52,11 @@ let dataProgress  = [];
 // check log File
 util.checkLogFileSize();
 
+if(util.dbg)
+{
+  util.deleteLogFile();
+}
+
 // Setup Click Event handlers globally here
 // weatherInfo
 let weatherInfo = document.getElementById("weatherInfo");

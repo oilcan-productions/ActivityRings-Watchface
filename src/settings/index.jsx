@@ -128,13 +128,15 @@ function mySettings(props) {
         <Section
             title={<Text bold align="center">Other Settings</Text>}>
         <Button
-          list
-          label="Reset Cache"
+          label="Reset Device Cache"
           onClick={() => props.settingsStorage.setItem("resetCache", "true")}
         />
          <Button
-          list
-          label="Get Logfile"
+          label="Reset Watchface Settings"
+          onClick={() => props.settingsStorage.setItem("resetSettings", "true")}
+        />
+         <Button
+          label="Get Logfile from device"
           onClick={() => props.settingsStorage.setItem("getlog", "true")}
         />
       </Section>

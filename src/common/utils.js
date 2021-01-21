@@ -8,7 +8,7 @@ export const LOG_FILE = "log.txt";
 export const LOG_TYPE = "ascii";
 
 // set debug output to on/off
-export const dbg = false;
+export const dbg = true;
 export const messageType = {
     DBG_INFO:       4,
     DBG_ERROR:      3,
@@ -139,7 +139,11 @@ export function listFiles(folderName) {
 
 // write to log file
 export function writeLog(message) {
-  let buffer = str2ab((new Date()).toString() + ": " + message + "\n");
+  let json_data = {
+    "timestamp" : (new Date()).toString(),
+    "message" : message
+  };
+  let buffer = str2ab((JSON.stringify(json_data)+"\n"));
   let fd = fs.openSync(LOG_FILE, 'a+');
   fs.writeSync(fd, buffer);
   fs.closeSync(fd);
