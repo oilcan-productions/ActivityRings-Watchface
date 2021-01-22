@@ -302,10 +302,7 @@ function calculateDateTzTime(offset) {
  
     // obtain the UTC time in milliseconds
     var utc = localTime + localOffset;
- 
- 
     var newDateTime = utc + (3600000 * offset);
- 
     var convertedDateTime = new Date(newDateTime);
     return convertedDateTime;
 }
@@ -314,14 +311,15 @@ function getWeatherForecast() {
   weather.fetchWeather();
 }
 
-getWeatherForecast();
-getHourlyStepCount();
+
+
 
 // Fetch the weather every 30 minutes
 setInterval(weather.fetchWeather, weatherRefreshInterval * 1000 * 60);
-
+getWeatherForecast();
 // refresh the hourly steps every 30 minutes
 setInterval(getHourlyStepCount, hourlyStepsRefreshInterval * 1000 * 60);
+getHourlyStepCount();
 
 // start the Heart Rate Monitor
 heartMonitor.initialize();
@@ -363,6 +361,12 @@ messaging.peerSocket.addEventListener("message", (evt) => {
 // cache functions
 // Register for the unload event
 appbit.onunload = saveCache();
+
+// Register for activation event
+document.addEventListener("activate", (evt) => {
+  console.log("app activate triggered");
+  loadCache();
+});
 
 function saveCache() {
   util.dbgWrite("Saving Cache.");
