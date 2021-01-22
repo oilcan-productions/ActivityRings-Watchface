@@ -7,7 +7,7 @@
   </svg>
   
   <svg id="faceVersionBlock" class="appData">
-    <text id="app-version" class="baseSettings smallestFont" x="50%+25" y="10" text="1.1.6" />
+    <text id="app-version" class="baseSettings smallestFont" x="75%" y="25" text="1.1.6" />
   </svg>
     <!-- Date -->
   <svg id="mainDate" pointer-events="visible" >

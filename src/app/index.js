@@ -17,7 +17,7 @@ import * as fs from "fs";
 const bIsSimulator = isSimulator();
 
 // version
-const app_version = "1.1.6";
+const app_version = "1.1.7";
 let appVersionLabel = document.getElementById("app-version");
 appVersionLabel.text = app_version;
 
