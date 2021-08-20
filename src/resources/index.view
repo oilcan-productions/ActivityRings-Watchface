@@ -1,65 +1,129 @@
 <svg id="mainDocument">
-  <!-- Battery Data -->
-  <svg id="batteryInfo" pointer-events="visible" >
-    <image id="batteryIcon" x="50%-19" y="10" href="icons/battery.png" width="38" height="18">
-      <rect id="batteryLevel" x="4" y="4" height="10" />
-    </image>
-  </svg>
-  
-  <svg id="faceVersionBlock" class="appData">
-    <text id="app-version" class="baseSettings smallestFont" x="75%" y="25" text="1.1.6" />
-  </svg>
+  <svg id="mainView" display="inline" pointer-events="visible">
+    <!-- Battery Data -->
+    <svg id="batteryInfo" pointer-events="visible" >
+      <image id="batteryIcon" x="50%-19" y="10" href="icons/battery.png" width="38" height="18">
+        <rect id="batteryLevel" x="4" y="4" height="10" opacity="1"/>
+      </image>
+    </svg>
+    <!-- Version Label -->
+    <svg id="faceVersionBlock" class="appData">
+      <text id="app-version" class="baseSettings smallestFont" x="75%" y="25" />
+    </svg>
+    
     <!-- Date -->
-  <svg id="mainDate" pointer-events="visible" >
-    <text id="weekDay" class="weekDaySettings" x="52" y="60"/> 
-    <text id="date" class="baseSettings" x="52" y="90" font-family="System-Regular" font-size="32"/> 
-  </svg>
-  <!-- Clock -->
-    <svg id="mainClock" viewport-fill="black" pointer-events="visible" >
-    <text id="clockLabel" x="60%" y="95"
-        fill="white" font-size="72" font-family="System-Regular"
-        text-anchor="middle" text-length="20">00:00</text>
-  </svg>
-  
-  <!-- Weather Data -->
-  <svg id="weatherInfo" pointer-events="visible" >
-    <image id="weatherImage" x="10%" y="37%" href="icons/whiteSun.png" width="80" height="80" />
+    <svg id="mainDate" pointer-events="visible" >
+      <text id="weekDay" class="weekDaySettings" x="52" y="60"/> 
+      <text id="date" class="baseSettings" x="52" y="90" font-family="System-Regular" font-size="32"/> 
+    </svg>
+    
+    <!-- Clock -->
+      <svg id="mainClock" viewport-fill="black" pointer-events="visible" >
+      <text id="clockLabel" x="60%" y="95"
+          fill="white" font-size="72" font-family="System-Regular"
+          text-anchor="middle" text-length="20">00:00</text>
+    </svg>
+    
+    <!-- Weather Data -->
+    <svg id="weatherInfo" pointer-events="visible" >
+      <image id="weatherImage" x="20%-50" y="50%-50" href="weatherIcons/01d@2x.png" width="100" height="100" fill="white"/>
+      <text id="weatherCity" x="45%" y="42%" class="leftAligned" font-family="System-Regular" font-size="24">Loading ...</text>
+      <text id="weatherCurrentTemp" x="45%" y="55%" class="leftAligned" font-family="System-Regular" font-size="50"></text>
+      <text id="weatherTemps" x="45%+5" y="60%" class="leftAligned" font-family="System-Regular" font-size="16"></text>
+    </svg>
+    
+    <!-- Second Timezone -->
+    <svg id="secondTz" pointer-events="visible" display="none">
+      <text id="secondTzCity" x="50%+10" y="75%+10" class="baseSettings tzCityFont">NOT SET</text>
+      <text id="secondTzData" x="50%+10" y="80%+30" class="baseSettings tzTimeFont">--:--</text>
+      <text id="secondTzDiff" x="50%+65" y="80%+30" class="baseSettings" font-size="20">--</text>
+    </svg>
+    
+    <!--Heart Rate Data-->
+    <g id="heartRate" pointer-events="visible">
+      <image id="dataIcon" href="icons/heartIcon.png" width="32" height="32" x="80%" y="80%-25" fill="fb-red" />
+      <text id="hrm-data" class="baseSettings smallFont" x="80%+15" y="80%+30" />
+    </g>
+    
+    <svg id="activityRings" pointer-events="visible" >  
+      <!-- Calories -->
+      <g id="calories" class="deviceData">
+        <arc id="arcBack" x="20%-37" y="80%-37" width="74" height="74" fill="#220003" arc-width="6" start-angle="0" sweep-angle="360" />
+        <arc id="arcFront" x="20%-37" y="80%-37" width="74" height="74" fill="#E20219" arc-width="6" start-angle="0" sweep-angle="0" />
+      </g>
+
+        <!-- Active Minutes -->
+      <g id="activeZoneMinutes" class="deviceData">
+        <arc id="arcBack" x="20%-29" y="80%-29" width="58" height="58" fill="#061800" arc-width="6" start-angle="0" sweep-angle="360" />
+        <arc id="arcFront" x="20%-29" y="80%-29" width="58" height="58" fill="#3CDD00" arc-width="6" start-angle="0" sweep-angle="0" />
+      </g>
+      
+      <!-- Steps -->
+      <g id="steps" class="deviceData">
+        <arc id="arcBack" x="20%-21" y="80%-21" width="42" height="42" fill="#001B20" arc-width="6" start-angle="0" sweep-angle="360" />
+        <arc id="arcFront" x="20%-21" y="80%-21" width="42" height="42" fill="#00BFDF" arc-width="6" start-angle="0" sweep-angle="0" />
+      </g>
+    </svg>
+  </svg> <!-- end of mainView-->
+
+  <!-- Activity Details View -->
+  <svg id="activityDetailView" display="none"  pointer-events="visible">
+      <!-- Calories Detail -->
+        <g id="caloriesDetail" class="deviceData">
+          <rect id="calorieDetail" x="0" y="5%" width="100%" height="30%-2" fill="fb-extra-dark-gray" pointer-events="visible"/>
+          <arc id="arcBack" x="10%" y="10%" width="65" height="65" fill="#220003" arc-width="9" start-angle="0" sweep-angle="360" />
+          <arc id="arcFront" x="10%" y="10%" width="65" height="65" fill="#E20219" arc-width="9" start-angle="0" sweep-angle="0" />
+          <image x="10%+17" y="10%+17" width="30" height="30" fill="#E20219" href="../resources/icons/calories_36px.png" />
+          <text id="caloriePercent" x="50%+14" y="10%+20" class="move-text"></text>
+          <text id="calorieLabel" x="35%-3" y="10%+20" class="label-text">MOVE</text>
+          <text id="calorieNumbers" x="35%-3" y="10%+55" class="label-text"></text>
+        </g>
+
+        <!-- Active Minutes Detail -->
+        <g id="activeMinutesDetail" class="deviceData">
+          <rect id="activeMinDetailFrame" x="0" y="35%" width="100%" height="30%-2" fill="fb-extra-dark-gray" pointer-events="visible"/>
+          <arc id="arcBack" x="10%" y="40%" width="65" height="65" fill="#061800" arc-width="9" start-angle="0" sweep-angle="360" />
+          <arc id="arcFront" x="10%" y="40%" width="65" height="65" fill="#3CDD00" arc-width="9" start-angle="0" sweep-angle="0" />
+          <image x="10%+17" y="40%+17" width="30" height="30" fill="#3CDD00" href="../resources/icons/azm_36px.png" />
+          <text id="activityPercent" x="50%+56" y="40%+20" class="excercise-text"></text>
+          <text id="activityLabel" x="35%-3" y="40%+20" class="label-text">EXERCISE</text>
+          <text id="activityNumbers" x="35%-3" y="40%+55" class="label-text"></text>
+        </g>
+          
+        <!-- Steps Detail -->
+        <g id="stepsDetail" class="deviceData" >
+          <rect id="stepDetailFrame" x="0" y="65%" width="100%" height="30%-2" fill="fb-extra-dark-gray" pointer-events="visible"/>
+          <arc id="arcBack" x="10%" y="70%" width="65" height="65" fill="#001B20" arc-width="9" start-angle="0" sweep-angle="360" />
+          <arc id="arcFront" x="10%" y="70%" width="65" height="65" fill="#00BFDF" arc-width="9" start-angle="0" sweep-angle="360" pointer-events="visible"/>
+          <image x="10%+17" y="70%+17" width="30" height="30" fill="#00BFDF" href="../resources/icons/steps_36px.png" />
+          <text id="standPercent" x="50%+22" y="70%+20" class="step-text"></text>
+          <text id="standLabel" x="35%-3" y="70%+20" class="label-text">STAND</text>
+          <text id="standNumbers" x="35%-3" y="70%+55" class="label-text"></text>
+        </g>
+  </svg> <!-- End of Activity Details View -->
+
+  <!-- Step goal Details View -->
+  <svg id="stepGoalDrillDown" pointer-events="visible" display="none">
+    <text id="adjustedSteps" x="15%" y="10%+20" font-size="25" fill="#00BFDF" text-length="64">STEPS</text>
+    <text id="lastMinuteSteps" x="15%" y="30%+20" font-size="25" fill="#00BFDF" text-length="64">STEPS</text>
+    <text id="currentMinuteSteps" x="15%" y="50%+20" font-size="25" fill="#00BFDF" text-length="64">STEPS</text>
+  </svg><!-- End of Step goal Details View -->
+
+  <!--  goal Details View -->
+  <svg id="goalDrillDown" pointer-events="visible" display="none">
+    <text id="stepGoal" x="15%" y="10%+20" font-size="25" fill="#00BFDF" text-length="64">STEPS</text>
+    <text id="standGoal" x="15%" y="30%+20" font-size="25" fill="#00BFDF" text-length="64">STEPS</text>
+    <text id="calorieGoal" x="15%" y="50%+20" font-size="25" fill="#00BFDF" text-length="64">CAL</text>
+    <text id="activeMinutesGoal" x="15%" y="50%+20" font-size="25" fill="#00BFDF" text-length="64">MIN</text>
+  </svg><!-- End of goal Details View -->
+
+  <svg id="locationDetailView" pointer-events="visible" display="none">
+    <image id="weatherImage" x="30%-50" y="50%-50" href="weatherIcons/01d@2x.png" width="100" height="100" />
     <text id="weatherCity" x="45%" y="42%" class="leftAligned" font-family="System-Regular" font-size="24">Unknown</text>
     <text id="weatherCurrentTemp" x="45%" y="55%" class="leftAligned" font-family="System-Regular" font-size="50">----</text>
     <text id="weatherTemps" x="45%+5" y="60%" class="leftAligned" font-family="System-Regular" font-size="16">L: ---  H: ----</text>
+    <text id="locSunRiseSet" x="45%+5" y="60%" class="leftAligned" font-family="System-Regular" font-size="16">R: ---  S: ----</text>
+    <text id="forecast" />
   </svg>
-  
-  <!-- Second Timezonz -->
-  <svg id="secondTz" pointer-events="visible" >livingwellbay
-    <text id="secondTzCity" x="50%+10" y="75%+10" class="baseSettings tzCityFont">UTC</text>
-    <text id="secondTzData" x="50%+10" y="80%+30" class="baseSettings tzTimeFont">--:--</text>
-    <text id="secondTzDiff" x="50%+65" y="80%+30" class="baseSettings" font-size="20">+1</text>
-  </svg>
-  
-  <!--Heart Rate Data-->
-  <g id="heartRate" pointer-events="visible">
-    <image id="dataIcon" href="icons/heartIcon.png" width="32" height="32" x="80%" y="80%-25" fill="fb-red" />
-    <text id="hrm-data" class="baseSettings smallFont" x="80%+15" y="80%+30" />
-  </g>
-  
-  <svg id="activityRings" pointer-events="visible" >  
-    <!-- Calories -->
-    <g id="calories" class="deviceData">
-      <arc id="arcBack" x="20%-36" y="80%-36" width="72" height="72" fill="#220003" arc-width="7" start-angle="0" sweep-angle="360" />
-      <arc id="arcFront" x="20%-36" y="80%-36" width="72" height="72" fill="#E20219" arc-width="7" start-angle="0" sweep-angle="45" />
-    </g>
-
-      <!-- Active Minutes -->
-    <g id="activeZoneMinutes" class="deviceData">
-      <arc id="arcBack" x="20%-29" y="80%-29" width="58" height="58" fill="#061800" arc-width="7" start-angle="0" sweep-angle="360" />
-      <arc id="arcFront" x="20%-29" y="80%-29" width="58" height="58" fill="#3CDD00" arc-width="7" start-angle="0" sweep-angle="65" />
-    </g>
-    
-    <!-- Steps -->
-    <g id="steps" class="deviceData">
-      <arc id="arcBack" x="20%-22" y="80%-22" width="44" height="44" fill="#001B20" arc-width="7" start-angle="0" sweep-angle="360" />
-      <arc id="arcFront" x="20%-22" y="80%-22" width="44" height="44" fill="#00BFDF" arc-width="7" start-angle="0" sweep-angle="100" />
-    </g>
-  </svg>
-
 </svg>
+

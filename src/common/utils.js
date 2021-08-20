@@ -1,21 +1,10 @@
 ////#region globals and imports
-import * as fs from "fs";
-import { listDirSync } from "fs";
-import { outbox } from "file-transfer";
-
-// log file constants
-export const LOG_FILE = "log.txt";
-export const LOG_TYPE = "ascii";
+import * as global from "../common/globals.js";
 
 // set debug output to on/off
-export const dbg = false;
-export const messageType = {
-    DBG_INFO:       4,
-    DBG_ERROR:      3,
-    DBG_WARNING:    2,
-    DBG_MESSAGE:    1,
-    DBG_PLAIN:      0
-}
+export const dbg = global.settings.isDebug;
+export let IS_SIMULATOR=false;
+
 ////#endregion
 
 ////#region functions
@@ -75,99 +64,86 @@ export function colorModifier(color, percent) {
 
   return "#"+RR+GG+BB;
 }
-
-// Debug Console Writer
-export function dbgWrite(message,severity,noOutput) {
-  if(!noOutput) {
-    if(isNaN(severity)) {
-      severity = 1;
-    }
-    switch(severity) {
-      case 3:
-        message = "WARNING:" + message;
-        if(dbg){console.warn (message);}
-        break;
-      case  2:
-        message = "ERROR: " + message;
-        if(dbg){console.error (message);}
-        break;
-      case 1:
-        message = "MESSAGE: " + message;
-        if(dbg){console.log (message);}
-        break;
-      case 4: 
-        message = "INFO: " + message;
-        if(dbg){console.log (message);}
-        break;
-      default:
-        if(dbg){console.log (message);}
-        break;
-    }
-  }
-  // write to the log file.
-  writeLog(message);
-}
-
-// delete the log file
-export function deleteLogFile() {
-  fs.unlinkSync(LOG_FILE);
-}
-
-// truncate log file if larger than 200k bytes
-export function checkLogFileSize(maxFileSize) {
-  if (fs.existsSync(LOG_FILE)) {
-    let stats = fs.statSync(LOG_FILE);
-    if (stats) {
-      console.log("File size: " + stats.size + " bytes");
-      console.log("Last modified: " + stats.mtime);
-      if(stats.size >= 200000) {
-          deleteLogFile();
-          dbgWrite("Truncated logfile.",messageType.DBG_WARNING);
-      }
-    }
-  }
-}
-
-// list files in the device directory 
-export function listFiles(folderName) {
-  let dirIter = null;
-  const listDir = listDirSync(folderName);
-  while((dirIter = listDir.next()) && !dirIter.done) {
-    dbgWrite("File: " + dirIter.value, DBG_INFO);
-  }
-}
-
-// write to log file
-export function writeLog(message) {
-  let json_data = {
-    "timestamp" : (new Date()).toString(),
-    "message" : message
-  };
-  let buffer = str2ab((JSON.stringify(json_data)+"\n"));
-  let fd = fs.openSync(LOG_FILE, 'a+');
-  fs.writeSync(fd, buffer);
-  fs.closeSync(fd);
-}
-
-// send the log to the companion
-export function sendLog() {
-  outbox
-   .enqueueFile(LOG_FILE)
-   .then((ft) => {
-     console.log(`Transfer of $‌{ft.name} successfully queued.`);
-   })
-   .catch((error) => {
-     console.log(`Failed to schedule transfer: $‌{error}`);
-   })
-}
-
-// convert string to buffer for log writing.
-function str2ab(str) {
-  var buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
-  var bufView = new Uint16Array(buf);
-  for (var i=0, strLen=str.length; i<strLen; i++) {
-    bufView[i] = str.charCodeAt(i);
-  }
-  return buf;
-}
 ////#endregion
+
+/**
+* Convert Celsius to Fahrenheit
+* @param {object} data - WeatherData -
+*/
+export function toFahrenheit(data) {
+  
+  if (data.unit.toLowerCase() === "celsius") {
+     data.temperature =  Math.round((data.temperature * 1.8)+32);
+     data.unit = "Fahrenheit";
+  }
+  
+  return data
+}
+
+/**
+* Convert Celsius to Fahrenheit
+* @param {object} data - WeatherData -
+*/
+export function toCelsius(data) {
+  
+  if (data.unit.toLowerCase() === "fahrenheit") {
+     data.temperature =  Math.round((data.temperature - 32)/1.8);
+     data.unit = "celsius";
+  }
+  
+  return data
+}
+
+function dstOffsetAtDate(dateInput) {
+  var fullYear = dateInput.getFullYear();
+// "Leap Years are any year that can be exactly divided by 4 (2012, 2016, etc)
+ //   except if it can be exactly divided by 100, then it isn't (2100,2200,etc)
+ //	  except if it can be exactly divided by 400, then it is (2000, 2400)"
+// (https://www.mathsisfun.com/leap-years.html).
+  var isLeapYear = ((fullYear & 3) | (fullYear/100 & 3)) === 0 ? 1 : 0;
+// (fullYear & 3) = (fullYear % 4), but faster
+  //Alternative:var isLeapYear=(new Date(currentYear,1,29,12)).getDate()===29?1:0
+  var fullMonth = dateInput.getMonth()|0;
+  return (
+      // 1. We know what the time since the Epoch really is
+      (+dateInput) // same as the dateInput.getTime() method
+      // 2. We know what the time since the Epoch at the start of the year is
+      - (+new Date(fullYear, 0, 0)) // day defaults to 1 if not explicitly zeroed
+      // 3. Now, subtract what we would expect the time to be if daylight savings
+      //      did not exist. This yields the time-offset due to daylight savings.
+      - ((
+          ((
+              // Calculate the day of the year in the Gregorian calendar
+              // The code below works based upon the facts of signed right shifts
+              //    • (x) >> n: shifts n and fills in the n highest bits with 0s 
+              //    • (-x) >> n: shifts n and fills in the n highest bits with 1s
+              // (This assumes that x is a positive integer)
+              (31 & ((-fullMonth) >> 4)) + // January // (-11)>>4 = -1
+              ((28 + isLeapYear) & ((1-fullMonth) >> 4)) + // February
+              (31 & ((2-fullMonth) >> 4)) + // March
+              (30 & ((3-fullMonth) >> 4)) + // April
+              (31 & ((4-fullMonth) >> 4)) + // May
+              (30 & ((5-fullMonth) >> 4)) + // June
+              (31 & ((6-fullMonth) >> 4)) + // July
+              (31 & ((7-fullMonth) >> 4)) + // August
+              (30 & ((8-fullMonth) >> 4)) + // September
+              (31 & ((9-fullMonth) >> 4)) + // October
+              (30 & ((10-fullMonth) >> 4)) + // November
+              // There are no months past December: the year rolls into the next.
+              // Thus, fullMonth is 0-based, so it will never be 12 in Javascript
+              
+              (dateInput.getDate()|0) // get day of the month
+      
+          )&0xffff) * 24 * 60 // 24 hours in a day, 60 minutes in an hour
+          + (dateInput.getHours()&0xff) * 60 // 60 minutes in an hour
+          + (dateInput.getMinutes()&0xff)
+      )|0) * 60 * 1000 // 60 seconds in a minute * 1000 milliseconds in a second
+      - (dateInput.getSeconds()&0xff) * 1000 // 1000 milliseconds in a second
+      - dateInput.getMilliseconds()
+  );
+}
+
+export function isDST(dateInput) {
+  // To satisfy the original question
+  return dstOffsetAtDate(dateInput) !== 0;
+}

@@ -7,7 +7,7 @@
 
 .leftAligned {
   fill: white;
-  text-length: 32;
+  text-length: 64;
   text-anchor: start;
   font-family: System-Light;
 }
@@ -52,4 +52,62 @@
 #steps #dataCount {
   font-size: 32;
   font-family: System-Light;
-  }
+}
+
+.list-item {
+  height: 200;
+}
+
+.list-item-header {
+  height: 100;
+}
+
+.list-item text {
+  fill: "fb-red";
+  x: 30%;
+  text-anchor: start;
+  font-size: 18;
+}
+
+.line {
+  height: 6;
+  width: 100%;
+  fill: #222222;
+  y: 100%-6;
+}
+
+.header text {
+  font-weight: bold;
+  fill: fb-cyan;
+  font-size: 30;
+}
+
+.footer text {
+  font-weight: bold;
+  fill: fb-green;
+  font-size: 30;
+}
+
+.label-text {
+  font-size: 25;
+  fill: white;
+  text-length: 32;
+}
+
+.move-text {
+  font-size: 25;
+  fill: #E20219;
+  text-length: 32;
+}
+
+.step-text {
+  font-size: 25;
+  fill: #00BFDF;
+  text-length: 32;
+}
+
+.excercise-text {
+  font-size: 25;
+  fill: #3CDD00;
+  text-length: 32;
+}

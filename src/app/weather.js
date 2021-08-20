@@ -1,93 +1,83 @@
 import * as messaging from "messaging";
-import document from "document";
-import * as util from "../common/utils";
+import * as document from "document";
+import * as logger from "../common/logger.js"
+import * as fs from "fs";
+import * as cache from "./cacheManager.js";
+import { units as units } from "user-settings";
 
 let weatherIcon = document.getElementById("weatherImage");
 let currentTemp = document.getElementById("weatherCurrentTemp");
 let weatherCity = document.getElementById("weatherCity");
 let lowHighTemp = document.getElementById("weatherTemps");
-let conditionIcon = "../resources/icons/whiteSun.png";
+let tempUnit = "fahrenheit";
 
-export function fetchWeather() {
+// check the user temp unit setting
+if(units.temperature=='C') {
+  tempUnit='celsius';
+} else {
+   tempUnit='fahrenheit';
+}
+
+export function fetchWeather2(strReason="",strFunction="",strSource="") {
   if (messaging.peerSocket.readyState === messaging.peerSocket.OPEN) {
-    // Send a command to the companion
+    // Send a command to the companion to get the weather
     messaging.peerSocket.send({
-      command: "weather"
+      command: "getFitbitWeather",
+      source: `${strSource},${strFunction}`,
+      reason: strReason,
+      unit: tempUnit
     });
   }
 }
 
-function processWeatherData(data) {
-  util.dbgWrite("Received Data: " + JSON.stringify(data));
-  util.dbgWrite(data.weatherData["main"]["temp"]);
-  util.dbgWrite(data.weatherData["main"]["temp_min"]);
-  util.dbgWrite(data.weatherData["main"]["temp_max"]);
-  util.dbgWrite(data.weatherData["weather"][0]["main"]);
-  util.dbgWrite(data.weatherData["name"]);
-  let condition = data.weatherData["weather"][0]["main"];
- 
-  switch(condition) {
-    case "Clear Sky": //ClearSky
-      if (isDay)
-        conditionIcon = "..resources/icons/whiteSun.png";
-      else
-        conditionIcon = "../resources/icons/whiteMoon.png" ;
-      break;
-    case "Scattered Clouds": //Scattered Clouds
-      if (isDay)
-        conditionIcon = "../resources/icons/whitePartlySunny.png";
-      else
-        conditionIcon = "../resources/icons/whitePartlyMoon.png";
-      break;
-    case "Clouds": //BrokenClouds
-      conditionIcon = "../resources/icons/whiteCloud.png";
-      break;
-    case "Showers": //ShowerRain
-    case "Rain": //Rain
-     conditionIcon = "../resources/icons/whiteRain.png";
-      break;
-    case "Thunderstorm": //Thunderstorm
-      if (wordStartsWith("T", description))
-        conditionIcon = "../resources/icons/whiteStorm.png";
-      else
-        conditionIcon = "../resources/icons/whiteRain.png";
-      break;
-    case "Snow": //Snow
-      conditionIcon = "../resources/icons/whiteSnow.png";
-      break;
-    case "Mist": //Mist
-      conditionIcon = "../resources/icons/whiteHaze.png";
-      break;
-    default: //Other
-      util.dbgWrite("Condition defaulted: " + condition);
-      if (isDay)
-        conditionIcon = "../resources/icons/whiteSun.png";
-      else
-        conditionIcon = "../resources/icons/whiteMoon.png";
-      break; 
-  }
-  util.dbgWrite("Selected Weather Icom: " + conditionIcon);
-  weatherIcon.href = conditionIcon;
-  currentTemp.text = Math.round(data.weatherData["main"]["temp"]) + "º";
-  weatherCity.text = data.weatherData["name"];
-  lowHighTemp.text = "L: " + Math.round(data.weatherData["main"]["temp_min"]) + "º / H: " + Math.round(data.weatherData["main"]["temp_max"]) + "º";
-}
-
-function isDay(){
-  return (Date.now() + 60000 * new Date().getTimezoneOffset() + 21600000) % 86400000 / 3600000 > 12;
-}
-
 messaging.peerSocket.addEventListener("open", (evt) => {
-  fetchWeather();
+  fetchWeather2;
 });
 
 messaging.peerSocket.addEventListener("message", (evt) => {
-  util.dbgWrite("Weather received message: " + JSON.stringify(evt.data));
-  if (evt.data["weatherData"]) {
-    processWeatherData(evt.data);
+  if (evt.data.kind =="weatherData") {
+    logger.dbgWrite(fs,`Weather::ReceivedWeatherData from Companion`);
+    processWeatherData2(evt.data);
+  }
+  else
+  {
+    logger.dbgWrite(fs,"app.weather.peerSocket: ignoring unrelated message: " + JSON.stringify(evt.data));
   }
 });
 
 messaging.peerSocket.addEventListener("error", (err) => {
-  console.error(`Connection error: ${err.code} - ${err.message}`);
+  logger.dbgWrite(fs,`app.weather.peerSocket: Connection error: ${err.code} - ${err.message}`,logger.messageType.DBG_ERROR);
 });
+
+function processWeatherData2(weatherData) {
+  let data = weatherData;
+  if(null == data) {
+    data = cache.retrieveKeyValuePair("fitbitWeatherData");
+  }
+  else {
+    cache.storeKeyValuePair("fitbitWeatherData",data);
+  }
+  logger.dbgWrite(fs,"app.weather.processWeatherData2: Received Weather Data: " + JSON.stringify(data));
+  logger.dbgWrite(fs,"app.weather.processWeatherData.currentTemp: " + data.temperature);
+  logger.dbgWrite(fs,"app.weather.processWeatherData.condition: " + data.condition);
+  logger.dbgWrite(fs,"app.weather.processWeatherData.locationName: " + data.locationName);
+  logger.dbgWrite(fs,"app.weather.processWeatherData.temperatureUnit: " + data.temperatureUnit);
+
+  let conditionIcon = `weather/${data.icon}`;
+
+  logger.dbgWrite(fs,"app.weather.processWeatherData: Selected Weather Icon: " + conditionIcon);
+  weatherIcon.href = conditionIcon;
+  let tempUnitText = "";
+  if(data.temperatureUnit == "celsius") {
+    tempUnitText = "C";
+  } else {
+    tempUnitText = "F";
+  }
+  currentTemp.text = `${Math.round(data.temperature)}º ${tempUnitText}`;
+  weatherCity.text = `${data.locationName}`;
+  lowHighTemp.text = `${data.condition_text}`;
+}
+
+export function setTempUnit(newTempUnit) {
+  tempUnit = newTempUnit;
+}

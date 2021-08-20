@@ -1,12 +1,12 @@
 {
   "devDependencies": {
-    "@fitbit/sdk": "~5.0.0",
+    "@fitbit/sdk": "~6.0.0",
     "@fitbit/sdk-cli": "^1.7.3"
   },
   "fitbit": {
-    "appUUID": "cb0c7758-fbf8-413e-b44c-3d6787848cec",
+    "appUUID": "17b5dd48-7c1e-4c7b-81ef-9130c6d5e385",
     "appType": "clockface",
-    "appDisplayName": "Activity Rings",
+    "appDisplayName": "Activity Rings +",
     "iconFile": "resources/icon.png",
     "wipeColor": "",
     "requestedPermissions": [
@@ -14,19 +14,26 @@
       "access_user_profile",
       "access_heart_rate",
       "access_location",
-      "access_internet"
+      "access_internet",
+      "run_background",
+      "access_exercise",
+      "access_calendar",
+      "access_sleep"
     ],
     "buildTargets": [
       "vulcan"
     ],
     "i18n": {
       "en-US": {
-        "name": "Activity Rings"
+        "name": "Activity Rings +"
       }
     },
     "defaultLanguage": "en-US"
   },
   "scripts": {
     "build": "fitbit-build"
+  },
+  "dependencies": {
+    "fitbit-logger": "0.0.6"
   }
 }
